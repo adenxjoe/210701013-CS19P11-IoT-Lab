@@ -1,0 +1,101 @@
+Problem
+
+This exercise can be used to send text messages to either
+individual numbers or entire contact groups.
+
+Solution
+
+pi@raspberrypi ~ $ nano mysms.py
+#!/usr/bin/env python
+import urllib.request
+import urllib.parse
+uname = 'bhuvaneswaran@rajalakshmi.edu.in'
+hashCode = '9890db2b86d4bf292adfc44fe0e19fc417e6f6a7'
+sender = 'TXTLCL'
+numbers = ('919791519152','919994940914')
+message = 'Test message sent from my Raspberry Pi'
+def sendSMS(uname, hashCode, numbers, sender, message):
+data = urllib.parse.urlencode({'username': uname, 'hash': hashCode,
+'numbers': numbers, 'message' : message, 'sender': sender})
+data = data.encode('utf-8')
+request = urllib.request.Request("http://api.textlocal.in/send/?")
+f = urllib.request.urlopen(request, data)
+fr = f.read()
+return(fr)
+resp = sendSMS(uname, hashCode, numbers, sender, message)
+print (resp)
+Running the python script:
+pi@raspberrypi ~ $ python3 mysms.py
+
+Discussion
+
+sender
+If you have a promotional account, do not send this
+parameter. If you have a transactional account, use
+this field to specify the sender name for your message.
+Sender name must be 6 alpha characters and should be
+pre-approved by Textlocal. In the absence of approved
+sender names, use the default 'TXTLCL'
+message
+The message content. This parameter should be no longer
+than 765 characters. See Helpful Information for
+message length details. The message also must be URL
+Encoded to support symbols like &.
+Workshop on “Internet of Things for Real Time Applications” - CSE / REC - 26
+Login Parameters
+username The email address used to log into Textlocal.
+hash
+Your secure hash can be found within Messenger in the
+main navigation under "Help->All Documentation".
+Alternatively you can use the password parameter
+instead and use your Textlocal password in plain text.
+apiKey
+This can be used instead of the username/hash/password.
+You can create them in your Messenger Control Panel
+(click here) for each application, and limit the usage
+of them by host IP Address.
+Optional Parameters
+numbers
+Comma-delimited list of mobile numbers in international
+format (i.e. 918123456789). Maximum of 10,000 numbers
+and error code 33 will be returned if exceeded.
+group_id
+This parameter can be used in place of
+the numbers parameter in order to send to an entire
+contact group. This parameter should contain the ID of
+the relevant group, which can found either within
+Messenger (in the "Reports" - "Advanced Reports" -
+"List of Group ID's" section) or by running
+the get_groups command. Additionally group 5 contains
+"contacts" and group 6 contains "opt-outs".
+schedule_tim
+e
+This parameter can be used to specify a schedule
+date/time for your message, which should be provided
+in Unix timestamp format. Times should be provided in
+GMT.
+receipt_url
+Use this field to specify an alternative URL to which
+the delivery receipt(s) will be sent. See handling
+receipts documentation.
+custom This value will be set against the message batch and
+will passed back in the delivery receipts. This allows
+you to match delivery receipts to their corresponding
+messages.
+optouts
+Can be set to true in order to check against your own
+opt-outs list and Textlocal's global opt-outs database.
+Your message will not be sent to numbers within these
+lists. If not provided defaults to false.
+validity
+Can be set, up to 72 hours in advance, to say after
+which time, you don't want the message delivered. This
+should be in a Unix timestamp format.
+unicode
+Set this value to true to specify that your message
+body will contain unicode characters.
+See Encoding/Decoding Unicode Documentation
+test
+Set this field to true to enable test mode, no messages
+will be sent and your credit balance will be
+unaffected. If not provided defaults to false
